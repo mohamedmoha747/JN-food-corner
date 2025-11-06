@@ -1,0 +1,79 @@
+import { useState } from 'react';
+import FoodItem from './components/FoodItem';
+import Cart from './components/Cart';
+import { foodItems } from './data/foodItems';
+
+function App() {
+  const [cart, setCart] = useState([]);
+
+  const addToCart = (item, quantity) => {
+    setCart(prevCart => {
+      const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
+      if (existingItem) {
+        return prevCart.map(cartItem =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: cartItem.quantity + quantity }
+            : cartItem
+        );
+      } else {
+        return [...prevCart, { ...item, quantity }];
+      }
+    });
+  };
+
+  const updateQuantity = (itemId, newQuantity) => {
+    if (newQuantity <= 0) {
+      removeFromCart(itemId);
+      return;
+    }
+    setCart(prevCart =>
+      prevCart.map(item =>
+        item.id === itemId ? { ...item, quantity: newQuantity } : item
+      )
+    );
+  };
+
+  const removeFromCart = (itemId) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== itemId));
+  };
+
+  const placeOrder = () => {
+    setCart([]);
+  };
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <h1>🍕 JN FOOD CORNER</h1>
+        <p>Order delicious food and get it delivered to your doorstep!</p>
+      </header>
+      
+      <div className="app-content">
+        <main className="menu-section">
+          <h2>Our Menu</h2>
+          <div className="food-grid">
+            {foodItems.map(item => (
+              <FoodItem
+                key={item.id}
+                item={item}
+                onAddToCart={addToCart}
+              />
+            ))}
+          </div>
+        </main>
+
+        <aside className="cart-section">
+          <Cart
+            cart={cart}
+            onPlaceOrder={placeOrder}
+            onRemoveItem={removeFromCart}
+            onUpdateQuantity={updateQuantity}
+          />
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+
