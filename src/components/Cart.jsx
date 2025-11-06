@@ -1,19 +1,63 @@
 function Cart({ cart, onPlaceOrder, onRemoveItem, onUpdateQuantity }) {
-  const calculateTotal = () => {
+  const DELIVERY_FEE = 20; // fixed delivery charge in rupees
+
+  const calculateSubtotal = () => {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
-  const formatOrderMessage = () => {
+  const calculateGrandTotal = () => {
+    return calculateSubtotal() + DELIVERY_FEE;
+  };
+
+  const formatOrderMessage = (mapsLink = '') => {
+    // Build message to match requested exact format
     let message = "Order Details:\n\n";
     cart.forEach(item => {
-      message += `${item.name} x${item.quantity} - ₹${item.price * item.quantity}\n`;
+      message += `${item.name} x${item.quantity} - ₹${item.price * item.quantity}\n\n`;
     });
-    message += `\nTotal: ₹${calculateTotal()}`;
+
+    message += `Subtotal: ₹${calculateSubtotal()}\n`;
+    message += `Delivery: ₹${DELIVERY_FEE}\n`;
+    message += `Grand Total: ₹${calculateGrandTotal()}\n\n`;
+
+    // Address section as requested
+    message += `TYPE ADDRESS:\n`;
+    message += `customer type address: This is optional,\n`;
+    message += `customer current Google map location:`;
+    if (mapsLink) {
+      message += `\n${mapsLink}`;
+    }
+
     return message;
   };
 
-  const handlePlaceOrder = () => {
-    const message = formatOrderMessage();
+  const getCurrentLocation = () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        return reject(new Error('Geolocation not supported'));
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve(pos.coords),
+        (err) => reject(err),
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    });
+  };
+
+  const handlePlaceOrder = async () => {
+    let mapsLink = '';
+    try {
+      const coords = await getCurrentLocation();
+      const lat = coords.latitude;
+      const lon = coords.longitude;
+      // Google Maps search link with coordinates
+      mapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+    } catch (err) {
+      // If permission denied or error, leave mapsLink empty so user can type address manually
+      mapsLink = '';
+    }
+
+    const message = formatOrderMessage(mapsLink);
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/919487902634?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
@@ -63,8 +107,10 @@ function Cart({ cart, onPlaceOrder, onRemoveItem, onUpdateQuantity }) {
           </div>
         ))}
       </div>
-      <div className="cart-total">
-        <h3>Total: ₹{calculateTotal()}</h3>
+      <div className="cart-summary">
+        <p>Subtotal: ₹{calculateSubtotal()}</p>
+        <p>Delivery: ₹{DELIVERY_FEE}</p>
+        <h3>Grand Total: ₹{calculateGrandTotal()}</h3>
       </div>
       <button className="place-order-btn" onClick={handlePlaceOrder}>
         Place Order via WhatsApp
