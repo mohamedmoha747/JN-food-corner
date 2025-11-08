@@ -30,6 +30,7 @@ function Cart({ cart, onPlaceOrder, onRemoveItem, onUpdateQuantity }) {
 
     return message;
   };
+  
 
   const getCurrentLocation = () => {
     return new Promise((resolve, reject) => {
