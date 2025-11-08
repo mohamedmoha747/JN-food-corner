@@ -17,13 +17,15 @@ export const foodItems = [
     id: 3,
     name: "Lays Chicken (Small)",
     price: 40,
-    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&h=500&fit=crop"
+    // image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&h=500&fit=crop"
+    image:"Image/WhatsApp Image 2025-11-08 at 13.38.52_807895ed.jpg"
   },
   {
     id: 4,
     name: "Lays Chicken (Big)",
     price: 60,
-    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&h=500&fit=crop"
+    image:"Image/WhatsApp Image 2025-11-08 at 13.38.52_807895ed.jpg"
+    // image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&h=500&fit=crop"
   },
   {
     id: 5,
